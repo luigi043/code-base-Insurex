@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>InsureX API CORS Test</title>
+</head>
+<body>
+    <div style="padding: 20px; font-family: Arial;">
+        <h2>InsureX API Connection Test</h2>
+        
+        <div style="margin-bottom: 20px;">
+            <h3>API Status</h3>
+            <button onclick="testHealth()">Test API Health</button>
+            <div id="healthResult" style="margin-top: 10px; padding: 10px; background: #f0f0f0;"></div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <h3>Test Login</h3>
+            <div>
+                <label>Email:</label><br>
+                <input type="email" id="email" value="admin@insurex.com" style="width: 300px; padding: 5px;"><br>
+                <label>Password:</label><br>
+                <input type="password" id="password" value="password" style="width: 300px; padding: 5px;"><br><br>
+                <button onclick="testLogin()" style="padding: 8px 16px;">Test Login</button>
+                <button onclick="testRegister()" style="padding: 8px 16px; margin-left: 10px;">Test Register</button>
+            </div>
+            <div id="loginResult" style="margin-top: 10px; padding: 10px; background: #f0f0f0;"></div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h3>Debug Info</h3>
+            <div id="debugInfo" style="background: #e0e0e0; padding: 10px; font-family: monospace;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5013/api';
+        
+        function debug(message) {
+            const debugDiv = document.getElementById('debugInfo');
+            debugDiv.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
+        }
+
+        async function testHealth() {
+            const resultDiv = document.getElementById('healthResult');
+            resultDiv.innerHTML = 'Testing...';
+            debug('Testing health endpoint...');
+            
+            try {
+                const response = await fetch('http://localhost:5013/health');
+                const text = await response.text();
+                resultDiv.innerHTML = '? API Health: ' + text;
+                debug('Health check successful: ' + text);
+            } catch (error) {
+                resultDiv.innerHTML = '? Error: ' + error.message;
+                debug('Health check failed: ' + error.message);
+            }
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('loginResult');
+            
+            resultDiv.innerHTML = 'Logging in...';
+            debug('Attempting login with email: ' + email);
+            
+            try {
+                const response = await fetch(API_URL + '/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                debug('Login response status: ' + response.status);
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = '? Login successful!<br>Token: ' + data.token.substring(0, 50) + '...';
+                    debug('Login successful, token received');
+                } else {
+                    resultDiv.innerHTML = '? Login failed: ' + (data.message || JSON.stringify(data));
+                    debug('Login failed: ' + JSON.stringify(data));
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '? Error: ' + error.message;
+                debug('Login error: ' + error.message);
+            }
+        }
+
+        async function testRegister() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('loginResult');
+            
+            resultDiv.innerHTML = 'Registering...';
+            debug('Attempting registration with email: ' + email);
+            
+            try {
+                const response = await fetch(API_URL + '/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        email, 
+                        password,
+                        role: 'Admin' 
+                    })
+                });
+                
+                const data = await response.json();
+                debug('Register response status: ' + response.status);
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = '? Registration successful!';
+                    debug('Registration successful');
+                } else {
+                    resultDiv.innerHTML = '? Registration failed: ' + (data.message || JSON.stringify(data));
+                    debug('Registration failed: ' + JSON.stringify(data));
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '? Error: ' + error.message;
+                debug('Registration error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

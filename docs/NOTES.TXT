@@ -13,3 +13,10 @@ Senha: admin123
 Start the API: cd InsureX.ModernAPI && dotnet run
 
 Start React: cd insurex-react-app && npm run dev
+
+
+Login with these credentials:
+
+Email: admin@insurex.com
+
+Password: password

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h2>InsureX API Direct Test</h2>
+    
+    <div>
+        <h3>Test API Health</h3>
+        <button onclick="testHealth()">Test Health</button>
+        <pre id="healthResult"></pre>
+    </div>
+
+    <div>
+        <h3>Test Login</h3>
+        <div>
+            <label>Email:</label><br>
+            <input type="email" id="email" value="admin@insurex.com"><br>
+            <label>Password:</label><br>
+            <input type="password" id="password" value="password"><br><br>
+            <button onclick="testLogin()">Test Login</button>
+            <pre id="loginResult"></pre>
+        </div>
+    </div>
+
+    <script>
+        async function testHealth() {
+            const result = document.getElementById('healthResult');
+            result.textContent = 'Testing...';
+            
+            try {
+                const response = await fetch('http://localhost:5013/health');
+                const text = await response.text();
+                result.textContent = '? Success: ' + text;
+                result.style.color = 'green';
+            } catch (error) {
+                result.textContent = '? Error: ' + error.message;
+                result.style.color = 'red';
+            }
+        }
+
+        async function testLogin() {
+            const result = document.getElementById('loginResult');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            result.textContent = 'Testing...';
+            
+            try {
+                const response = await fetch('http://localhost:5013/api/Auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+                result.style.color = response.ok ? 'green' : 'red';
+            } catch (error) {
+                result.textContent = '? Error: ' + error.message;
+                result.style.color = 'red';
+            }
+        }
+    </script>
+</body>
+</html>

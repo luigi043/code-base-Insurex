@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>InsureX API Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div style="padding: 20px;">
+        <h2>InsureX API Test</h2>
+        
+        <div style="margin-bottom: 20px;">
+            <h3>Test Login</h3>
+            <div>
+                <label>Email:</label><br>
+                <input type="email" id="email" value="admin@insurex.com" style="width: 300px;"><br>
+                <label>Password:</label><br>
+                <input type="password" id="password" value="password" style="width: 300px;"><br>
+                <button onclick="testLogin()">Test Login</button>
+                <button onclick="testRegister()">Test Register</button>
+            </div>
+        </div>
+
+        <div id="result" style="margin-top: 20px; padding: 10px; background-color: #f0f0f0;">
+            Results will appear here...
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5013/api';
+
+        function showResult(message, isError = false) {
+            document.getElementById('result').innerHTML = message;
+            document.getElementById('result').style.color = isError ? 'red' : 'green';
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                showResult('Logging in...');
+                const response = await axios.post(`${API_URL}/auth/login`, {
+                    email,
+                    password
+                });
+                showResult('? Login successful! Token: ' + response.data.token.substring(0, 50) + '...');
+                console.log('Full token:', response.data.token);
+            } catch (error) {
+                showResult('? Error: ' + (error.response?.data?.message || error.message), true);
+                console.error('Error details:', error.response?.data || error);
+            }
+        }
+
+        async function testRegister() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                showResult('Registering...');
+                const response = await axios.post(`${API_URL}/auth/register`, {
+                    email,
+                    password,
+                    role: 'Admin'
+                });
+                showResult('? Registration successful!');
+            } catch (error) {
+                showResult('? Error: ' + (error.response?.data?.message || error.message), true);
+                console.error('Error details:', error.response?.data || error);
+            }
+        }
+    </script>
+</body>
+</html>

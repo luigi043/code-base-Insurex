@@ -1,69 +1,89 @@
 import React, { useState } from 'react';
+import { authService } from '../services/api';
 
-function Login() {
-    const [email, setEmail] = useState('admin@insurex.com');
-    const [password, setPassword] = useState('password');
-    const [message, setMessage] = useState('');
-    const [token, setToken] = useState('');
+const Login: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    const login = async () => {
-        try {
-            setMessage('Logging in...');
-            const res = await fetch('http://localhost:5013/api/Auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                setMessage('Success!');
-                setToken(data.token);
-            } else {
-                setMessage('Failed: ' + (data.message || 'Unknown error'));
-            }
-        } catch (err: any) {
-            setMessage('Error: ' + err.message);
-        }
-    };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-    const register = async () => {
-        try {
-            setMessage('Registering...');
-            const res = await fetch('http://localhost:5013/api/Auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password, role: 'Admin' })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                setMessage('Registered! Try login now.');
-            } else {
-                setMessage('Failed: ' + (data.message || 'Unknown error'));
-            }
-        } catch (err: any) {
-            setMessage('Error: ' + err.message);
-        }
-    };
+    try {
+      const response = await authService.login(email, password);
+      console.log('Login successful:', response);
+      // Redirecionar para dashboard
+      window.location.href = '/dashboard';
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Erro ao fazer login');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <div style={{ padding: 20, fontFamily: 'Arial' }}>
-            <h2>InsureX Login</h2>
-            <div>
-                <div>Email:</div>
-                <input value={email} onChange={e => setEmail(e.target.value)} style={{ width: 300, padding: 5 }} />
-            </div>
-            <div style={{ marginTop: 10 }}>
-                <div>Password:</div>
-                <input type="password" value={password} onChange={e => setPassword(e.target.value)} style={{ width: 300, padding: 5 }} />
-            </div>
-            <div style={{ marginTop: 20 }}>
-                <button onClick={register} style={{ marginRight: 10, padding: '10px 20px' }}>Register</button>
-                <button onClick={login} style={{ padding: '10px 20px' }}>Login</button>
-            </div>
-            <div style={{ marginTop: 20, padding: 10, background: '#f0f0f0' }}>{message}</div>
-            {token && <div style={{ marginTop: 10, wordBreak: 'break-all' }}>Token: {token.substring(0, 50)}...</div>}
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            InsureX Login
+          </h2>
         </div>
-    );
-}
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              {error}
+            </div>
+          )}
+          <div className="rounded-md shadow-sm -space-y-px">
+            <div>
+              <label htmlFor="email" className="sr-only">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="sr-only">
+                Senha
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300"
+            >
+              {loading ? 'Entrando...' : 'Entrar'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 export default Login;

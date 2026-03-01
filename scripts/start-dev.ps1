@@ -1,26 +1,43 @@
-﻿Write-Host "=== STARTING INSUREX SERVICES ===" -ForegroundColor Cyan
+﻿# start-dev.ps1
+Write-Host "=========================================" -ForegroundColor Cyan
+Write-Host "Iniciando InsureX Development Environment" -ForegroundColor Cyan
+Write-Host "=========================================" -ForegroundColor Cyan
 
-# Start API in new window
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd InsureX.ModernAPI; dotnet run"
-Write-Host "✅ API starting at http://localhost:5012"
-
-Start-Sleep -Seconds 3
-
-# Check if React app exists and start it
-if (Test-Path "insurex-react-app") {
-    Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd insurex-react-app; npm start"
-    Write-Host "✅ React app starting at http://localhost:3000"
-} elseif (Test-Path "insurex-react-vite") {
-    Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd insurex-react-vite; npm run dev"
-    Write-Host "✅ Vite React app starting at http://localhost:5173"
+# Iniciar Modern API em background
+Write-Host ""
+Write-Host "1. Iniciando Modern API..." -ForegroundColor Green
+$apiJob = Start-Job -ScriptBlock {
+    Set-Location "C:\Users\cluiz\code-base-Insurex\InsureX.ModernAPI"
+    dotnet run
 }
 
-Write-Host "`n📊 Open these URLs:"
-Write-Host "   API Swagger: http://localhost:5012/swagger"
-Write-Host "   React App: http://localhost:3000 or http://localhost:5173"
+Write-Host "   API iniciada em: http://localhost:5012" -ForegroundColor Yellow
+Write-Host "   Swagger: http://localhost:5012/swagger" -ForegroundColor Yellow
 
-Write-Host "`n🧪 To run tests in another terminal:"
-Write-Host "   cd InsureX.IntegrationTests; dotnet test"
+# Aguardar API iniciar
+Start-Sleep -Seconds 5
+
+# Iniciar React App
 Write-Host ""
-Write-Host "Press any key to exit..."
-Read-Host
+Write-Host "2. Iniciando React App..." -ForegroundColor Green
+Set-Location "C:\Users\cluiz\code-base-Insurex\insurex-react-app"
+
+# Verificar se node_modules existe
+if (!(Test-Path "node_modules")) {
+    Write-Host "   Instalando dependências..." -ForegroundColor Yellow
+    npm install
+}
+
+# Iniciar React
+Start-Process npm -ArgumentList "start"
+
+Write-Host ""
+Write-Host "=========================================" -ForegroundColor Green
+Write-Host "✅ Ambiente iniciado!" -ForegroundColor Green
+Write-Host "=========================================" -ForegroundColor Green
+Write-Host ""
+Write-Host "📱 React App: http://localhost:3000" -ForegroundColor Cyan
+Write-Host "🔧 API: http://localhost:5012" -ForegroundColor Cyan
+Write-Host "📚 Swagger: http://localhost:5012/swagger" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Pressione Ctrl+C para encerrar"

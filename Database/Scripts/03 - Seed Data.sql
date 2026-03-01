@@ -32,3 +32,17 @@ END
 
 PRINT 'Seed data inserted successfully';
 GO
+
+-- Add to 03 - Seed Data.sql
+INSERT INTO Policies (PolicyNumber, CustomerName, StartDate, EndDate, Status, TotalInsuredValue)
+VALUES 
+('POL-2026-001', 'ABC Corporation', '2026-01-01', '2027-01-01', 'Active', 5000000),
+('POL-2026-002', 'XYZ Enterprises', '2026-02-15', '2027-02-15', 'Active', 2500000),
+('POL-2026-003', 'Smith Family', '2026-03-01', '2027-03-01', 'Pending', 750000);
+
+-- Admin, Financer, Insurer, Customer roles
+INSERT INTO Users (Email, PasswordHash, Role, PartnerId)
+VALUES 
+('admin@insurex.com', 'hashed_pwd', 'Admin', NULL),
+('financer@bank.com', 'hashed_pwd', 'Financer', 1),
+('insurer@mutual.com', 'hashed_pwd', 'Insurer', 2);

@@ -150,14 +150,14 @@ public class AssetsController : ControllerBase
             return StatusCode(500, new { message = "Erro interno ao criar ativo" });
         }
     }
+}
 
-    public class CreateAssetRequest
-    {
-        public string AssetType { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public int PolicyId { get; set; }
-        public decimal FinanceValue { get; set; }
-        public decimal InsuredValue { get; set; }
-        public Dictionary<string, object>? Details { get; set; }
-    }
+public class CreateAssetRequest
+{
+    public string AssetType { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public int PolicyId { get; set; }
+    public decimal FinanceValue { get; set; }
+    public decimal InsuredValue { get; set; }
+    public Dictionary<string, object>? Details { get; set; }
 }

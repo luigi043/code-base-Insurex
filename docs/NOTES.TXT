@@ -4,8 +4,12 @@ dotnet run
 
 # Terminal 2: Iniciar React
 cd insurex-react-app
-npm start
+npm run dev
 
 Email: admin@insurex.com
 
 Senha: admin123
+
+Start the API: cd InsureX.ModernAPI && dotnet run
+
+Start React: cd insurex-react-app && npm run dev

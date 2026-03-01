@@ -1,0 +1,26 @@
+﻿version: '3.8'
+services:
+  api:
+    build:
+      context: ./InsureX.ModernAPI
+      dockerfile: Dockerfile
+    ports:
+      - "5012:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=InsureX;User=sa;Password=YourStrong!Password;TrustServerCertificate=true
+    depends_on:
+      - db
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong!Password
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+volumes:
+  sql_data:

@@ -1,80 +1,74 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json;
+using System.Text.Json.Serialization;
+using InsureX.ModernAPI.Helpers;
 
-namespace InsureX.ModernAPI.Models;
-
-public class Asset
+namespace InsureX.ModernAPI.Models
 {
-    [Key]
-    public int Id { get; set; }
-    
-    [Required]
-    [MaxLength(50)]
-    public string AssetType { get; set; } = string.Empty; // Vehicle, Property, Watercraft, etc.
-    
-    [Required]
-    [MaxLength(200)]
-    public string Description { get; set; } = string.Empty;
-    
-    [Required]
-    public int PolicyId { get; set; }
-    
-    [Column(TypeName = "decimal(18,2)")]
-    public decimal FinanceValue { get; set; }
-    
-    [Column(TypeName = "decimal(18,2)")]
-    public decimal InsuredValue { get; set; }
-    
-    [MaxLength(50)]
-    public string? Status { get; set; } = "Active";
-    
-    [Required]
-    public string JsonData { get; set; } = "{}";
-    
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    
-    public DateTime? UpdatedAt { get; set; }
-    
-    public bool IsDeleted { get; set; } = false;
-    
-    // Navigation Properties
-    [ForeignKey("PolicyId")]
-    public virtual Policy Policy { get; set; } = null!;
-    
-    // Helper methods para acessar JsonData
-    public T? GetJsonValue<T>(string key)
+    public class Asset
     {
-        try
+        [Key]
+        public int Id { get; set; }
+        
+        [Required]
+        [StringLength(50)]
+        public string AssetType { get; set; } = string.Empty;
+        
+        [Required]
+        [StringLength(200)]
+        public string Description { get; set; } = string.Empty;
+        
+        [Required]
+        public int PolicyId { get; set; }
+        
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal FinanceValue { get; set; }
+        
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal InsuredValue { get; set; }
+        
+        [StringLength(50)]
+        public string? Status { get; set; } = "Active";
+        
+        [Required]
+        public string JsonData { get; set; } = "{}";
+        
+        public DateTime CreatedAt { get; set; }
+        
+        public DateTime? UpdatedAt { get; set; }
+        
+        public bool IsDeleted { get; set; }
+        
+        // Navigation properties
+        [ForeignKey("PolicyId")]
+        [JsonIgnore]
+        public virtual Policy? Policy { get; set; }
+
+        // Helper method to get typed asset
+        [JsonIgnore]
+        public AssetBase? TypedAsset
         {
-            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(JsonData);
-            if (data != null && data.ContainsKey(key))
+            get
             {
-                var element = (JsonElement)data[key];
-                return JsonSerializer.Deserialize<T>(element.GetRawText());
+                try
+                {
+                    return AssetFactory.CreateAsset(AssetType, JsonData);
+                }
+                catch
+                {
+                    return null;
+                }
             }
         }
-        catch { }
-        return default;
-    }
-    
-    public string? GetJsonValue(string key)
-    {
-        return GetJsonValue<string?>(key);
-    }
-    
-    public void SetJsonValue(string key, object? value)
-    {
-        try
+
+        // Helper method to update JsonData from typed asset
+        public void UpdateJsonData(AssetBase asset)
         {
-            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(JsonData) ?? new();
-            if (value == null)
-                data.Remove(key);
-            else
-                data[key] = value;
-            
-            JsonData = JsonSerializer.Serialize(data);
+            JsonData = asset.ToJson();
+            UpdatedAt = DateTime.UtcNow;
         }
-        catch { }
     }
 }

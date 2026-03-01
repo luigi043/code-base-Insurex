@@ -1,9 +1,9 @@
 # Terminal 1: Iniciar API
-cd C:\Users\cluiz\code-base-Insurex\InsureX.ModernAPI
+cd InsureX.ModernAPI
 dotnet run
 
 # Terminal 2: Iniciar React
-cd C:\Users\cluiz\code-base-Insurex\insurex-react-app
+cd insurex-react-app
 npm start
 
 Email: admin@insurex.com

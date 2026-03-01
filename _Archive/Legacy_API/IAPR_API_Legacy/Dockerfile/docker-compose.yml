@@ -1,0 +1,16 @@
+# Simplified example structure
+version: '3.8'
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    # ... ports, env variables
+  insurex.api:
+    build: ./InsureX.API
+    ports:
+      - "5000:80"
+    # ... depends_on sqlserver
+  insurex.react:
+    build: ./insurex-react-app
+    ports:
+      - "3000:3000"
+    # ...

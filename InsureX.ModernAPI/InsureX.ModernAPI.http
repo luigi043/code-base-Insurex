@@ -1,0 +1,6 @@
+@InsureX.ModernAPI_HostAddress = http://localhost:5012
+
+GET {{InsureX.ModernAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

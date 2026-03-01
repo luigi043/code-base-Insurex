@@ -1,0 +1,11 @@
+# Terminal 1: Iniciar API
+cd C:\Users\cluiz\code-base-Insurex\InsureX.ModernAPI
+dotnet run
+
+# Terminal 2: Iniciar React
+cd C:\Users\cluiz\code-base-Insurex\insurex-react-app
+npm start
+
+Email: admin@insurex.com
+
+Senha: admin123
